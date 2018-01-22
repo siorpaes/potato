@@ -33,6 +33,11 @@ architecture behaviour of pp_soc_memory is
 	type memory_array is array(0 to (MEMORY_SIZE / 4) - 1) of std_logic_vector(31 downto 0);
 	signal memory : memory_array := (others => (others => '0'));
 
+	--Infer Block RAM for Lattice FPGA
+	attribute syn_ramstyle : string;
+	attribute syn_ramstyle of memory : signal is "block_ram";
+
+	--Infer Block RAM for Xilinx FPGA
 	attribute ram_style : string;
 	attribute ram_style of memory : signal is "block";
 
@@ -81,6 +86,6 @@ begin
 				end if;
 			end if;
 		end if;
-	end process clk;
+	end process;
 
 end architecture behaviour;
