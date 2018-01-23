@@ -23,7 +23,7 @@ void exception_handler(uint32_t cause, void * epc, void * regbase)
 
 int main(void)
 {
-	const char* hello_string = "** Welcome to Potato chip **\n\r";
+	const char* hello_string = "\n\r  ** Welcome to Potato chip ! **\n\r";
 	const char* boot_string = "\n\rBooting\n\r";
 
 	uart_initialize(&uart0, (volatile void *) PLATFORM_UART0_BASE);
@@ -42,6 +42,7 @@ int main(void)
 		while(uart_rx_fifo_empty(&uart0));
 		*((uint8_t*)(APP_START + i)) = uart_rx(&uart0);
 
+#if 0
 		/* Print some dots */
 		while(uart_tx_fifo_full(&uart0));
 		uart_tx(&uart0, '.');
@@ -52,6 +53,7 @@ int main(void)
 			while(uart_tx_fifo_full(&uart0));
 			uart_tx(&uart0, '\r');
 		}
+#endif
 	}
 
 	/* Print booting message */
