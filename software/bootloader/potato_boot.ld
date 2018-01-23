@@ -7,14 +7,14 @@ ENTRY(_start)
 
 MEMORY
 {
-	RAM (rwx)     : ORIGIN = 0x00000000, LENGTH = 0x10000000 /* Not implemented! */
-	AEE_ROM (rwx) : ORIGIN = 0xffffc000, LENGTH = 0x00002000
-	AEE_RAM (rwx) : ORIGIN = 0xffffe000, LENGTH = 0x00002000
+	RAM (rwx)    : ORIGIN = 0x00000000, LENGTH = 0x10000000 /* Not implemented! */
+	AEE_ROM (rx) : ORIGIN = 0xffff8000, LENGTH = 0x00004000
+	AEE_RAM (rw) : ORIGIN = 0xffffe000, LENGTH = 0x00002000
 }
 
 SECTIONS
 {
-	.text 0xffffc100 :
+	.text 0xffff8100 :
 	{
 		*(.init)
 		*(.text*)
