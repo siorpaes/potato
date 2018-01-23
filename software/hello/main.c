@@ -7,29 +7,43 @@
 #include "platform.h"
 #include "uart.h"
 
+static struct uart uart0;
+
+
 void exception_handler(uint32_t cause, void * epc, void * regbase)
 {
-	// Not used in this application
+	while(uart_tx_fifo_full(&uart0));
+	uart_tx(&uart0, 'E');
 }
 
-static struct uart uart0;
+
+void delay(int delay)
+{
+	volatile int i;
+
+	while(delay--)
+		for(i=0; i<1000; i++);
+}
+
 
 int main(void)
 {
 	int n = 0;
-	const char * hello_string = "Hello world! \n\r";
+	const char * hello_string = " Hello world :) \n\r";
 
 	uart_initialize(&uart0, (volatile void *) PLATFORM_UART0_BASE);
 	uart_set_divisor(&uart0, uart_baud2divisor(115200, PLATFORM_SYSCLK_FREQ));
 
 	while(1){
+		while(uart_tx_fifo_full(&uart0));
+		uart_tx(&uart0, 'A' + (n++ % ('z'-'A'+1)));
+
 		for(int i = 0; hello_string[i] != 0; ++i){
 			while(uart_tx_fifo_full(&uart0));
 			uart_tx(&uart0, hello_string[i]);
 		}
-		
-		while(uart_tx_fifo_full(&uart0));
-		uart_tx(&uart0, '0' + (n++ % 10));
+
+		delay(500);
 	}
 
 	return 0;
