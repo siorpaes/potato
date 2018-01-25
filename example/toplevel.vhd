@@ -14,6 +14,7 @@ use ieee.std_logic_1164.all;
 -- 0xc0003000: UART1 (for connecting a GPS to JA)
 -- 0xc0004000: GPIO0
 -- 0xc0005000: Interconnect control/error module
+-- 0xc0006000: SSD
 -- 0xffff8000: Application execution environment ROM (16 kB)
 -- 0xffffc000: Application execution environment RAM (16 kB)
 entity toplevel is
@@ -33,7 +34,11 @@ entity toplevel is
 
 		-- UART1 signals:
 		uart1_txd : out std_logic;
-		uart1_rxd : in  std_logic
+		uart1_rxd : in  std_logic;
+
+        -- Seven Segments Display signals:
+        segments :  out std_logic_vector(6 downto 0);
+        anodes   :  out std_logic_vector(3 downto 0)
 	);
 end entity toplevel;
 
@@ -115,6 +120,15 @@ architecture behaviour of toplevel is
 	signal gpio_we_in   : std_logic;
 	signal gpio_ack_out : std_logic;
 
+    -- SSD signals:
+	signal ssd_adr_in  : std_logic_vector(11 downto 0);
+	signal ssd_dat_in  : std_logic_vector(31 downto 0);
+	signal ssd_dat_out : std_logic_vector(31 downto 0);
+	signal ssd_cyc_in  : std_logic;
+	signal ssd_stb_in  : std_logic;
+	signal ssd_we_in   : std_logic;
+	signal ssd_ack_out : std_logic;
+
 	-- Interconnect control module:
 	signal intercon_adr_in  : std_logic_vector(11 downto 0);
 	signal intercon_dat_in  : std_logic_vector(31 downto 0);
@@ -155,7 +169,7 @@ architecture behaviour of toplevel is
 	-- Selected peripheral on the interconnect:
 	type intercon_peripheral_type is (
 		PERIPHERAL_TIMER0, PERIPHERAL_TIMER1,
-		PERIPHERAL_UART0, PERIPHERAL_UART1, PERIPHERAL_GPIO,
+		PERIPHERAL_UART0, PERIPHERAL_UART1, PERIPHERAL_GPIO, PERIPHERAL_SSD, 
 		PERIPHERAL_AEE_ROM, PERIPHERAL_AEE_RAM, PERIPHERAL_INTERCON,
 		PERIPHERAL_ERROR, PERIPHERAL_NONE);
 	signal intercon_peripheral : intercon_peripheral_type := PERIPHERAL_NONE;
@@ -199,6 +213,8 @@ begin
 									intercon_peripheral <= PERIPHERAL_GPIO;
 								when x"5" =>
 									intercon_peripheral <= PERIPHERAL_INTERCON;
+								when x"6" =>
+                                    intercon_peripheral <= PERIPHERAL_SSD;                                	
 								when others => -- Invalid address - delegated to the error peripheral
 									intercon_peripheral <= PERIPHERAL_ERROR;
 							end case;
@@ -227,7 +243,7 @@ begin
 	processor_intercon: process(intercon_peripheral,
 		timer0_ack_out, timer0_dat_out, timer1_ack_out, timer1_dat_out,
 		uart0_ack_out, uart0_dat_out, uart1_ack_out, uart1_dat_out,
-		gpio_ack_out, gpio_dat_out,
+		gpio_ack_out, gpio_dat_out, ssd_ack_out, ssd_dat_out,
 		intercon_ack_out, intercon_dat_out, error_ack_out,
 		aee_rom_ack_out, aee_rom_dat_out, aee_ram_ack_out, aee_ram_dat_out)
 	begin
@@ -247,6 +263,9 @@ begin
 			when PERIPHERAL_GPIO =>
 				processor_ack_in <= gpio_ack_out;
 				processor_dat_in <= gpio_dat_out;
+			when PERIPHERAL_SSD =>
+                processor_ack_in <= ssd_ack_out;
+                processor_dat_in <= ssd_dat_out;
 			when PERIPHERAL_INTERCON =>
 				processor_ack_in <= intercon_ack_out;
 				processor_dat_in <= intercon_dat_out;
@@ -354,6 +373,27 @@ begin
 	gpio_we_in  <= processor_we_out;
 	gpio_cyc_in <= processor_cyc_out when intercon_peripheral = PERIPHERAL_GPIO else '0';
 	gpio_stb_in <= processor_stb_out when intercon_peripheral = PERIPHERAL_GPIO else '0';
+
+    ssd: entity work.pp_soc_ssd
+        generic map(CLK_DIVISOR => 50000)
+        port map(
+            clk => system_clk,
+            reset => reset,
+            segments => segments,
+            anodes => anodes,
+            wb_adr_in => ssd_adr_in,
+            wb_dat_in => ssd_dat_in,
+            wb_dat_out => ssd_dat_out,
+            wb_cyc_in => ssd_cyc_in,
+            wb_stb_in => ssd_stb_in,
+            wb_we_in => ssd_we_in,
+            wb_ack_out => ssd_ack_out
+        );
+	ssd_adr_in <= processor_adr_out(gpio_adr_in'range);
+    ssd_dat_in <= processor_dat_out;
+    ssd_we_in  <= processor_we_out;
+    ssd_cyc_in <= processor_cyc_out when intercon_peripheral = PERIPHERAL_SSD else '0';
+    ssd_stb_in <= processor_stb_out when intercon_peripheral = PERIPHERAL_SSD else '0';
 
 	uart0: entity work.pp_soc_uart
 		generic map(
