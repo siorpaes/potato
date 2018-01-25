@@ -29,7 +29,7 @@ entity pp_soc_ssd is
 
 		-- Seven Segments Display interface:
 		segments :  out std_logic_vector(6 downto 0);
-		anodes   :  out std_logic_vector(6 downto 0);
+		anodes   :  out std_logic_vector(3 downto 0);
 
 		-- Wishbone interface:
 		wb_adr_in  : in  std_logic_vector(11 downto 0);
@@ -96,13 +96,13 @@ begin
 					--Read
 						case wb_adr_in is
 							when x"000" =>
-							  wb_dat_out <= digit0;
+							  wb_dat_out <= digit0 & x"0000000";
 							when x"004" =>
-							  wb_dat_out <= digit1;
+							  wb_dat_out <= digit1 & x"0000000";
 							when x"008" =>
-							  wb_dat_out <= digit2;
-							when x"00c"
-							  wb_dat_out <= digit3;
+							  wb_dat_out <= digit2 & x"0000000";
+							when x"00c" =>
+							  wb_dat_out <= digit3 & x"0000000";
 							when others =>
 						end case;
 						ack <= '1';
