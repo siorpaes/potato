@@ -8,14 +8,15 @@
 #include "platform.h"
 #include "ssd.h"
 
-#define TXR *((uint32_t*)(0xc0007000))
-#define RXR *((uint32_t*)(0xc0007004))
-#define DIV *((uint32_t*)(0xc0007008))
-#define BSY *((uint32_t*)(0xc000700c))
+#define TXR *((volatile uint32_t*)(0xc0007000))
+#define RXR *((volatile uint32_t*)(0xc0007004))
+#define DIV *((volatile uint32_t*)(0xc0007008))
+#define BSY *((volatile uint32_t*)(0xc000700c))
 
 void exception_handler(uint32_t cause, void * epc, void * regbase)
 {
-
+	ssdPrintInt(cause);
+	while(1);
 }
 
 
@@ -30,15 +31,27 @@ void delay(int delay)
 
 int main(void)
 {
-	uint32_t val = 0;
+	unsigned int val = 0;
 
-	DIV = 128;
+	/* Set SPI divisor */
+	DIV = 100;
+
 	ssdPrintInt(DIV);
+	delay(1000);
 	
 	while(1){
+		/* Send data over SPI */
 		TXR = val & 0xff;
-		val++;
+
+		/* Wait until completed */
+		while(BSY);
+
+		/* Read data sent by slave and print it on SSD */
+		ssdPrintInt(RXR);
+
 		delay(50);
+		
+		val++;
 	}
 
 	return 0;
