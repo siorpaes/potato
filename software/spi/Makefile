@@ -20,25 +20,25 @@ TARGET_LDFLAGS += -march=rv32i -nostartfiles -L../libsoc \
 
 OBJECTS := main.o start.o ssd.o
 
-all: ssd.coe
+all: spi.coe
 
-ssd.elf: $(OBJECTS)
-	$(TARGET_LD) -o ssd.elf $(TARGET_LDFLAGS) $(OBJECTS)
-	$(TARGET_SIZE) ssd.elf
+spi.elf: $(OBJECTS)
+	$(TARGET_LD) -o spi.elf $(TARGET_LDFLAGS) $(OBJECTS)
+	$(TARGET_SIZE) spi.elf
 
-ssd.bin: ssd.elf
-	$(TARGET_OBJCOPY) -j .text -j .data -O binary ssd.elf ssd.bin
+spi.bin: spi.elf
+	$(TARGET_OBJCOPY) -j .text -j .data -O binary spi.elf spi.bin
 
-ssd.coe: ssd.bin
-	echo "memory_initialization_radix=16;" > ssd.coe
-	echo "memory_initialization_vector=" >> ssd.coe
-	for i in $$(seq 0 63); do echo 00000013 >> ssd.coe; done
-	$(HEXDUMP) -v -e '1/4 "%08x\n"' ssd.bin >> ssd.coe
-	echo ";" >> ssd.coe
+spi.coe: spi.bin
+	echo "memory_initialization_radix=16;" > spi.coe
+	echo "memory_initialization_vector=" >> spi.coe
+	for i in $$(seq 0 63); do echo 00000013 >> spi.coe; done
+	$(HEXDUMP) -v -e '1/4 "%08x\n"' spi.bin >> spi.coe
+	echo ";" >> spi.coe
 
 clean:
 	-$(RM) $(OBJECTS)
-	-$(RM) ssd.elf ssd.bin ssd.coe
+	-$(RM) spi.elf spi.bin spi.coe
 
 # Object file rules:
 
