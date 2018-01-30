@@ -66,3 +66,11 @@ set_property PACKAGE_PIN V4 [get_ports {anodes[2]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {anodes[2]}]
 set_property PACKAGE_PIN W4 [get_ports {anodes[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {anodes[3]}]
+
+## SPI interface
+set_property PACKAGE_PIN A14 [get_ports sclk]					
+set_property IOSTANDARD LVCMOS33 [get_ports sclk]
+set_property PACKAGE_PIN A16 [get_ports mosi]					
+set_property IOSTANDARD LVCMOS33 [get_ports mosi]
+set_property PACKAGE_PIN B15 [get_ports miso]					
+set_property IOSTANDARD LVCMOS33 [get_ports miso]
