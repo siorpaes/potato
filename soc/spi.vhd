@@ -1,5 +1,6 @@
 ----------------------------------------------------------------------------------
--- Simple SPI master peripheral. Implements only CPOL = 0, CPHA = 0
+-- Simple SPI master peripheral. Implements only CPOL = 0, CPHA = 0, LSB first
+--
 -- david.siorpaes@gmail.com
 ----------------------------------------------------------------------------------
 
