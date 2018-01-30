@@ -12,7 +12,7 @@ use ieee.numeric_std.all;
 --! | Address | Description                                                   |
 --! |---------|---------------------------------------------------------------|
 --! | 0x00    | TXDATA:  Data to be transmitted. Initiates tx (read/write)    |
---! | 0x04    | RXDATA:  Incoming data                        (read/write)    |
+--! | 0x04    | RXDATA:  Incoming data                        (read only)     |
 --! | 0x08    | DIVISOR: SPI clock divisor                    (read/write)    |
 --! | 0x0c    | BUSY:    Bit 0 indicates SPI busy             (read only)     |
 --! |---------|---------------------------------------------------------------|
@@ -44,16 +44,16 @@ architecture behaviour of pp_soc_spi_wrapper is
 	signal ack : std_logic := '0';
     
     -- SPI peripheral signals
-    signal  r_clk     : std_logic;                        -- Clock signal
-    signal  r_reset   : std_logic;                        -- Reset signal    
-    signal  r_txdata  : std_logic_vector (7 downto 0 );   -- MOSI data
+    signal  r_clk     : std_logic;                       -- Clock signal
+    signal  r_reset   : std_logic;                       -- Reset signal    
+    signal  r_txdata  : std_logic_vector (7 downto 0 );  -- MOSI data
     signal  r_rxdata  : std_logic_vector (7 downto 0);   -- MISO data
     signal  r_busy    : std_logic;                       -- Peripheral working
-    signal  r_start   : std_logic;                        -- Start SPI transaction when 1
-    signal  r_divisor : std_logic_vector (7 downto 0);    -- SPI clock divisor
+    signal  r_start   : std_logic;                       -- Start SPI transaction when 1
+    signal  r_divisor : std_logic_vector (7 downto 0);   -- SPI clock divisor
     signal  r_sclk    : std_logic;                       -- SCLK signal
     signal  r_mosi    : std_logic;                       -- MOSI signal
-    signal  r_miso    : std_logic;                        -- MISO signal
+    signal  r_miso    : std_logic;                       -- MISO signal
     
 begin
 	wb_ack_out <= ack and wb_cyc_in and wb_stb_in;
@@ -81,13 +81,13 @@ begin
 					-- Read
 						case wb_adr_in is
 							when x"000" =>
-							  wb_dat_out <= r_txdata  & x"000000";
+							  wb_dat_out <= x"000000" & r_txdata;
 							when x"004" =>
-							  wb_dat_out <= r_rxdata  & x"000000";
+							  wb_dat_out <= x"000000" & r_rxdata ;
 							when x"008" =>
-							  wb_dat_out <= r_divisor & x"000000";
+							  wb_dat_out <= x"000000" & r_divisor;
 							when x"00c" =>
-							  wb_dat_out <= r_busy &  "0000000000000000000000000000000";
+							  wb_dat_out <= "0000000000000000000000000000000" & r_busy;
 							when others =>
 						end case;
 						ack <= '1';
