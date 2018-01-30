@@ -11,7 +11,8 @@
 
 void exception_handler(uint32_t cause, void * epc, void * regbase)
 {
-
+	ssdPrintInt(cause);
+	while(1);
 }
 
 
@@ -23,14 +24,12 @@ void delay(int delay)
 		for(i=0; i<1000; i++);
 }
 
-
 int main(void)
 {
-	uint32_t val = 0;
-
+	int val = 0;
+	
 	while(1){
 		ssdPrintInt(val++);
-
 		delay(50);
 	}
 
