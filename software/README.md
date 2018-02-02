@@ -31,3 +31,7 @@ implement this mechanism:
     +-------------------------------+        +-------------------------------+       +-------------------------------+
 
 See README file in "hello" folder for instructions on how to build application binary image.
+
+You can simulate processor with
+riscv32-unknown-elf-run --memory-region 0xffff8000,0x4000 --memory-region 0xffffc000,0x4000 application.elf
+
