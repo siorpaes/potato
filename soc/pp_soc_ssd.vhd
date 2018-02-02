@@ -163,9 +163,14 @@ case digit is
 	when "0110" => segments <="0100000";  -- '6'                              
 	when "0111" => segments <="0001111";  -- '7'                              
 	when "1000" => segments <="0000000";  -- '8'                              
-	when "1001" => segments <="0000100";  -- '9'                              
-	 --nothing is displayed when a number greater than 9 is given as input.     
-	when others=> segments <="1111111";                                      
+	when "1001" => segments <="0000100";  -- '9'
+	when "1010" => segments <="0001000";  -- 'A'
+	when "1011" => segments <="1100000";  -- 'b'
+	when "1100" => segments <="0110001";  -- 'C'
+	when "1101" => segments <="1000010";  -- 'd'
+	when "1110" => segments <="0110000";  -- 'E'
+	when "1111" => segments <="0111000";  -- 'F'
+	when others => segments <="1111111";           
 end case;
 end process;
 
