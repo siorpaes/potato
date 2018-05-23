@@ -15,7 +15,7 @@ use work.pp_csr.all;
 entity pp_core is
 	generic(
 		PROCESSOR_ID           : std_logic_vector(31 downto 0) := x"00000000"; --! Processor ID.
-		RESET_ADDRESS          : std_logic_vector(31 downto 0) := x"00000200"; --! Address of the first instruction to execute.
+		RESET_ADDRESS          : std_logic_vector(31 downto 0) := x"00000000"; --! Address of the first instruction to execute.
 		MTIME_DIVIDER          : positive := 5                                 --! Divider for the clock driving the MTIME counter
 	);
 	port(
@@ -65,7 +65,6 @@ architecture behaviour of pp_core is
 
 	-- CSR read port signals:
 	signal csr_read_data      : std_logic_vector(31 downto 0);
-	signal csr_read_writeable : boolean;
 	signal csr_read_address, csr_read_address_p : csr_address;
 
 	-- Status register outputs:
@@ -76,8 +75,8 @@ architecture behaviour of pp_core is
 	-- Internal interrupt signals:
 	signal software_interrupt, timer_interrupt : std_logic;
 
-	-- Load hazard detected in the execute stage:
-	signal load_hazard_detected : std_logic;
+	-- Hazard detected in the execute stage:
+	signal hazard_detected : std_logic;
 
 	-- Branch targets:
 	signal exception_target, branch_target : std_logic_vector(31 downto 0);
@@ -164,7 +163,7 @@ begin
 
 	stall_if <= stall_id;
 	stall_id <= stall_ex;
-	stall_ex <= load_hazard_detected or stall_mem;
+	stall_ex <= hazard_detected or stall_mem;
 	stall_mem <= to_std_logic(memop_is_load(mem_mem_op) and dmem_read_ack = '0')
 		or to_std_logic(mem_mem_op = MEMOP_TYPE_STORE and dmem_write_ack = '0');
 
@@ -185,7 +184,6 @@ begin
 				test_context_out => test_context_out,
 				read_address => csr_read_address,
 				read_data_out => csr_read_data,
-				read_writeable => csr_read_writeable,
 				write_address => wb_csr_address,
 				write_data_in => wb_csr_data,
 				write_mode => wb_csr_write,
@@ -322,7 +320,6 @@ begin
 			csr_write_out => ex_csr_write,
 			csr_value_in => csr_read_data,
 			csr_value_out => ex_csr_data,
-			csr_writeable_in => csr_read_writeable,
 			csr_use_immediate_in => id_csr_use_immediate,
 			alu_op_in => id_alu_op,
 			alu_x_src_in => id_alu_x_src,
@@ -353,20 +350,16 @@ begin
 			mem_rd_addr => mem_rd_address,
 			mem_rd_value => mem_rd_data,
 			mem_csr_addr => mem_csr_address,
-			mem_csr_value => mem_csr_data,
 			mem_csr_write => mem_csr_write,
 			mem_exception => mem_exception,
-			mem_exception_context => mem_exception_context,
 			wb_rd_write => wb_rd_write,
 			wb_rd_addr => wb_rd_address,
 			wb_rd_value => wb_rd_data,
 			wb_csr_addr => wb_csr_address,
-			wb_csr_value => wb_csr_data,
 			wb_csr_write => wb_csr_write,
 			wb_exception => wb_exception,
-			wb_exception_context => wb_exception_context,
 			mem_mem_op => mem_mem_op,
-			load_hazard_detected => load_hazard_detected
+			hazard_detected => hazard_detected
 		);
 
 	dmem_address <= ex_dmem_address when stall_mem = '0' else dmem_address_p;

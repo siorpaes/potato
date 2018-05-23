@@ -102,7 +102,7 @@ void exception_handler(uint32_t mcause, uint32_t mepc, uint32_t sp)
 				}
 
 				potato_disable_interrupts();
-				while(1) asm volatile("nop");
+				while(1) potato_wfi();
 
 				break;
 			}
@@ -176,7 +176,6 @@ int main(void)
 		potato_enable_interrupts();
 	}
 
-	uart_tx_string(&uart0, "exit\n\r");
 	return 0;
 }
 
@@ -191,7 +190,7 @@ static void int2string(int n, char * s)
 		return;
 	}
 
-	if(n & (1 << 31))
+	if(n & (1u << 31))
 	{
 		n = ~n + 1;
 		*(s++) = '-';
