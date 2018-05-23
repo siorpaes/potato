@@ -32,7 +32,6 @@ spi.bin: spi.elf
 spi.coe: spi.bin
 	echo "memory_initialization_radix=16;" > spi.coe
 	echo "memory_initialization_vector=" >> spi.coe
-	for i in $$(seq 0 63); do echo 00000013 >> spi.coe; done
 	$(HEXDUMP) -v -e '1/4 "%08x\n"' spi.bin >> spi.coe
 	echo ";" >> spi.coe
 

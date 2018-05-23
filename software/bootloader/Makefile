@@ -32,7 +32,6 @@ boot.bin: boot.elf
 boot.coe: boot.bin
 	echo "memory_initialization_radix=16;" > boot.coe
 	echo "memory_initialization_vector=" >> boot.coe
-	for i in $$(seq 0 63); do echo 00000013 >> boot.coe; done
 	$(HEXDUMP) -v -e '1/4 "%08x\n"' boot.bin >> boot.coe
 	echo ";" >> boot.coe
 

@@ -32,7 +32,6 @@ ssd.bin: ssd.elf
 ssd.coe: ssd.bin
 	echo "memory_initialization_radix=16;" > ssd.coe
 	echo "memory_initialization_vector=" >> ssd.coe
-	for i in $$(seq 0 63); do echo 00000013 >> ssd.coe; done
 	$(HEXDUMP) -v -e '1/4 "%08x\n"' ssd.bin >> ssd.coe
 	echo ";" >> ssd.coe
 

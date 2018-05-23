@@ -18,7 +18,7 @@
 
 #define APP_START (0xffffc000)
 #define APP_LEN   (0x2000)
-#define APP_ENTRY (0xffffc200)
+#define APP_ENTRY (0xffffc000)
 
 static struct uart uart0;
 

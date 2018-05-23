@@ -2,7 +2,7 @@ A very trivial bootloader has been created so to ease software development and t
 The bootloader (pre-built image can be found in "images" folder) emits a welcome message
 over serial (@115200, 8N1) and waits for a 8kB binary image to be sent over UART.
 Once the image has been received, the booloader jumps in the new application entry
-point 0xffffc200.
+point 0xffffc000.
 The bootloader and application layouts had to be modified as follows in order to
 implement this mechanism:
 

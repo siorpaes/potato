@@ -32,7 +32,6 @@ crashme.bin: crashme.elf
 crashme.coe: crashme.bin
 	echo "memory_initialization_radix=16;" > crashme.coe
 	echo "memory_initialization_vector=" >> crashme.coe
-	for i in $$(seq 0 63); do echo 00000013 >> crashme.coe; done
 	$(HEXDUMP) -v -e '1/4 "%08x\n"' crashme.bin >> crashme.coe
 	echo ";" >> crashme.coe
 
