@@ -30,8 +30,11 @@ implement this mechanism:
     | 0xffff8000                    |        |                               |       |    -    -    -                |
     +-------------------------------+        +-------------------------------+       +-------------------------------+
 
-See README file in "hello" folder for instructions on how to build application binary image.
+To boot the image, just build it and upload it to the board as follows:
 
-You can simulate processor with
+cat hello.bin /dev/zero | head -c8k | pv -L 1000 > /dev/ttyUSB1
+
+
+You can also simulate processor with:
 riscv32-unknown-elf-run --memory-region 0xffff8000,0x4000 --memory-region 0xffffc000,0x4000 application.elf
 
