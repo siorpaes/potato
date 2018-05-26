@@ -20,7 +20,7 @@ TARGET_LDFLAGS += -march=rv32i -nostartfiles -L../libsoc \
 
 OBJECTS := main.o start.o
 
-all: gpio.coe
+all: gpio.coe gpio.img
 
 gpio.elf: $(OBJECTS)
 	$(TARGET_LD) -o gpio.elf $(TARGET_LDFLAGS) $(OBJECTS)
@@ -35,9 +35,12 @@ gpio.coe: gpio.bin
 	$(HEXDUMP) -v -e '1/4 "%08x\n"' gpio.bin >> gpio.coe
 	echo ";" >> gpio.coe
 
+gpio.img: gpio.bin
+	cat gpio.bin /dev/zero | head -c8k > gpio.img
+
 clean:
 	-$(RM) $(OBJECTS)
-	-$(RM) gpio.elf gpio.bin gpio.coe
+	-$(RM) gpio.elf gpio.bin gpio.coe gpio.img
 
 # Object file rules:
 
